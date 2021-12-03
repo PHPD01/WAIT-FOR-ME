@@ -159,7 +159,7 @@ const verifyShowUserInfo = (req, res, next) => {
   }
 };
 
-app.post("/showUserInfo", verifyShowUserInfo, (req, res) => {});
+app.post("/showUserInfo", verifyShowUserInfo, (req, res) => { });
 
 
 
@@ -195,7 +195,7 @@ const verifyRevise = (req, res, next) => {
   }
 };
 
-app.put("/revise", verifyRevise, (req, res) => {});
+app.put("/revise", verifyRevise, (req, res) => { });
 
 // 驗證+查詢評論資料
 const verifyShowComment = (req, res, next) => {
@@ -226,7 +226,7 @@ const verifyShowComment = (req, res, next) => {
   }
 };
 
-app.post("/showUserComment", verifyShowComment, (req, res) => {});
+app.post("/showUserComment", verifyShowComment, (req, res) => { });
 
 // 接登入前端資料
 app.post("/login", (req, res) => {
@@ -415,3 +415,58 @@ app.delete("/sdata/delete/:id", (req, res) => {
     }
   );
 });
+
+// Yi-chieh
+
+// 接收訂位資訊 
+
+app.post('/api/order', (request, response) => {
+  console.log('post=>', request.body);
+  const datetime = request.body.datetime
+  const person = request.body.person
+  const ordertime_select = request.body.ordertime_select
+  const sid = request.body.id
+  const sqlOrderInsert = "INSERT INTO order_info (sid,datetime,person,ordertime_select) VALUES(?,?,?,?)"
+  conn.query(sqlOrderInsert, [sid, datetime, person, ordertime_select], (err, result) => {
+    console.log(result);
+  })
+
+})
+
+// 第二頁 : 回應訂位資訊
+
+app.get('/api/order/get', (request, response) => {
+  const getOrderInfo = "SELECT * FROM order_info as o ORDER BY o.id DESC LIMIT 1"
+  conn.query(getOrderInfo, (err, result) => {
+    response.send(result);
+  })
+})
+
+// 接收聯絡資訊
+
+app.post('/api/order/contact', (request, response) => {
+  console.log('post=>', request.body)
+  const id = request.body.id
+  const name = request.body.name
+  const phone = request.body.phone
+  const note = request.body.note
+  const sqlOrderContactInsert = 'INSERT INTO order_customer (id,name,phone,note) VALUES(?,?,?,?)'
+  conn.query(sqlOrderContactInsert, [id, name, phone, note], (err, result) => {
+    console.log(result);
+  })
+})
+
+// 第三頁 回應訂位資料+聯絡資訊
+
+app.get('/api/order/completed_info', (request, response) => {
+  const getOrderCompletedInfo = "SELECT * FROM order_info as oi ORDER BY oi.id DESC LIMIT 1"
+  conn.query(getOrderCompletedInfo, (err, result) => {
+    response.send(result);
+  })
+})
+app.get('/api/order/completed_contact', (request, response) => {
+  const getOrderCompletedContact = "SELECT * FROM order_customer as oc ORDER BY oc.id DESC LIMIT 1"
+  conn.query(getOrderCompletedContact, (err, result) => {
+    response.send(result);
+  })
+})

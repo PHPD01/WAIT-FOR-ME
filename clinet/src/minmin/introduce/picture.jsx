@@ -122,17 +122,17 @@ function Picture({ data }) {
               </Route>
               <Route exact path='/order/information'>
                 <Col xs={12} xl={6}>
-                  <Order_information />
+                  <Order_information data={data} />
                 </Col>
               </Route>
               <Route exact path='/order/check' >
                 <Col xs={12} xl={6}>
-                  <OrderCheck />
+                  <OrderCheck data={data} />
                 </Col>
               </Route>
               <Route exact path='/order/Completed' >
                 <Col xs={12} xl={6}>
-                  <OrderCompleted />
+                  <OrderCompleted data={data} />
                 </Col>
               </Route>
             </Switch>

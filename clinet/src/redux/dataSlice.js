@@ -41,7 +41,20 @@ const dataSlice = createSlice({
           v.tag3?.toLowerCase().includes(action.payload.toLowerCase())
         );
       });
-      localStorage.setItem("newData", JSON.stringify(state.newData));
+    },
+    createSdata: (state, action) => {
+      state.newData.unshift(action.payload); //前面新增一筆
+    },
+    editSdata: (state, action) => {
+      state.newData = state.newData.map((v, i) => {
+        //data巡覽出來 return把v做改變
+        return v.id == action.payload.id ? action.payload : v;
+      });
+    },
+    deleteSdata: (state, action) => {
+      state.newData = state.newData.filter((v, i) => {
+        return v.id != action.payload;
+      });
     },
   },
   extraReducers: {
@@ -60,6 +73,6 @@ const dataSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { search } = dataSlice.actions;
+export const { search, createSdata, deleteSdata, editSdata } = dataSlice.actions;
 
 export default dataSlice.reducer;

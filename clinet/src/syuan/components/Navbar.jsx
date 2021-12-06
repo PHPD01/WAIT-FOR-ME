@@ -9,7 +9,6 @@ function Navbar() {
   return (
     <div>
       <nav class="navbar navbar-expand-lg navbar-light bg-light navbarbackcolor">
-
         <Link to="/" className="navbar-brand navLogo">
           餵for me
         </Link>
@@ -21,8 +20,7 @@ function Navbar() {
           data-target="#navbarSupportedContent"
           aria-controls="navbarSupportedContent"
           aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+          aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -39,7 +37,6 @@ function Navbar() {
             <Link to="/page1" className="navbar-brand">
               會員登入/註冊
             </Link>
-
 
             {/* <nav class="nav_bar">
               <ul class="nav_middle">
@@ -71,14 +68,11 @@ function Navbar() {
                 </li>
               </ul>
             </nav> */}
-
-
           </div>
         </div>
       </nav>
 
       {/* <Footer></Footer> */}
-
     </div>
   );
 }

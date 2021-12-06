@@ -3,33 +3,15 @@ import { Button, Form, FormControl, Image, Modal } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { deleteSdata, editSdata } from "../../redux/dataSlice";
 
 //卡在
 // 傳照片一定要先送出才會setnewImg
 // 不分開不行
 // 試試看用後端ＳＱＬ只另存進去
 //解決：不要把newImg當作狀態，直接設變數(狀態改變會在下次渲染？？)
-function Update({
-  onHide,
-  show,
-  id,
-  name,
-  address,
-  phone,
-  city,
-  foodtype,
-  cost,
-  f1,
-  f2,
-  s1,
-  s2,
-  tag1,
-  tag2,
-  tag3,
-  article,
-  img,
-  status,
-}) {
+function Update({ onHide, show, id, name, address, phone, city, foodtype, cost, f1, f2, s1, s2, tag1, tag2, tag3, article, img, status }) {
   const [ostatus, setstatus] = useState(status); //新增status時
   const [oname, setname] = useState(name); //oname->oldname
   const [oaddress, setaddress] = useState(address);
@@ -48,6 +30,8 @@ function Update({
   const [oarticle, setarticle] = useState(article);
   const [files, setFiles] = useState([]); //FileList {0: File, length: 1}//拿來1.post2.拿來預覽
 
+  const dispatch = useDispatch();
+
   //選取照片，預覽照片
   let newImg = img;
   const inputImg = (e) => {
@@ -62,27 +46,29 @@ function Update({
 
   // put餐廳資訊(等待照片上傳產生ＵＲＬ後)
   const onSubmit = async () => {
+    let temp = {
+      name: oname,
+      address: oaddress,
+      phone: ophone,
+      city: ocity,
+      ft: oft,
+      cost: ocost,
+      time1: of1 + "-" + of2,
+      time2: os1 + "-" + os2,
+      tag1: otag1,
+      tag2: otag2,
+      tag3: otag3,
+      article: oarticle,
+      img: newImg,
+      id: id,
+      status: ostatus,
+    };
     await axios
-      .put("http://localhost:3001/sdata/update", {
-        name: oname,
-        address: oaddress,
-        phone: ophone,
-        city: ocity,
-        ft: oft,
-        cost: ocost,
-        time1: of1 + "-" + of2,
-        time2: os1 + "-" + os2,
-        tag1: otag1,
-        tag2: otag2,
-        tag3: otag3,
-        article: oarticle,
-        img: newImg,
-        id: id,
-        status: ostatus,
-      })
+      .put("http://localhost:3001/sdata/update", temp)
       .then((res) => {
         toast.success("更新成功");
-        window.location.reload();
+        // window.location.reload();
+        dispatch(editSdata(temp)); //12/6改redux deleteSdata傳入id去更新newData更新畫面
       })
       .catch((error) => {
         console.error(error);
@@ -105,7 +91,7 @@ function Update({
       })
       .then(() => {})
       .catch((e) => {
-        toast.error("Upload Error");
+        // toast.error("Upload Error");
       });
   };
 
@@ -117,7 +103,8 @@ function Update({
         .delete(`http://localhost:3001/sdata/delete/${id}`)
         .then(() => {
           toast.success("刪除成功");
-          window.location.reload();
+          // window.location.reload();
+          dispatch(deleteSdata(id)); //12/6改redux deleteSdata傳入id去更新newData更新畫面
         })
         .catch((err) => {
           alert(err);
@@ -128,13 +115,7 @@ function Update({
   };
 
   return (
-    <Modal
-      className="model "
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter "
-      centered
-      {...{ onHide, show }}
-    >
+    <Modal className="model " size="lg" aria-labelledby="contained-modal-title-vcenter " centered {...{ onHide, show }}>
       <Form className=" mx-auto frame my-5">
         <div>
           <h3 className="line">
@@ -175,8 +156,7 @@ function Update({
             value={ostatus}
             onChange={(e) => {
               setstatus(e.target.value);
-            }}
-          >
+            }}>
             <option value={1}>上架中</option>
             <option value={0}>下架中</option>
           </Form.Select>
@@ -188,14 +168,9 @@ function Update({
           onChange={(e) => inputImg(e)}
           className="form-control"
           multiple
-          accept="image/gif, image/jpeg, image/png"
-        ></FormControl>
+          accept="image/gif, image/jpeg, image/png"></FormControl>
         {/* </div> */}
-        <Image
-          id="blah"
-          src={img && `http://localhost:3001/${img}`}
-          thumbnail
-        />
+        <Image id="blah" src={img && `http://localhost:3001/${img}`} thumbnail />
 
         <Form.Group className="mb-3">
           <Form.Label>餐廳地址</Form.Label>
@@ -230,8 +205,7 @@ function Update({
             value={ocity}
             onChange={(e) => {
               setcity(e.target.value);
-            }}
-          >
+            }}>
             <option value="臺北">臺北</option>
             <option value="新北">新北</option>
             <option value="基隆">基隆</option>
@@ -265,8 +239,7 @@ function Update({
             value={oft}
             onChange={(e) => {
               setft(e.target.value);
-            }}
-          >
+            }}>
             <option value="小吃">小吃</option>
             <option value="燒烤">燒烤</option>
             <option value="炸物">炸物</option>
@@ -406,8 +379,7 @@ function Update({
           onClick={() => {
             ondelete(id);
             onHide();
-          }}
-        >
+          }}>
           刪除餐廳
         </Button>
 
@@ -421,8 +393,7 @@ function Update({
             await onSubmitF(e);
             await onSubmit();
             await onHide();
-          }}
-        >
+          }}>
           確認送出
         </Button>
       </Form>

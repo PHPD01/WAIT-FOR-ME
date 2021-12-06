@@ -15,7 +15,7 @@ app.listen(port, () => {
 const mysql = require("mysql");
 const conn = mysql.createConnection({
   user: "root",
-  password: "",
+  password: "root",
   host: "localhost",
   database: "foodie",
   multipleStatements: true,
@@ -55,13 +55,9 @@ app.get("/", (req, rep) => {
 //放進<StoreListFather>
 app.get("/page3", function (req, rep) {
   id = req.query.id;
-  conn.query(
-    "select * from stores where id = ? ;",
-    [id],
-    function (err, result) {
-      err ? console.log(err) : rep.send(JSON.stringify(result));
-    }
-  );
+  conn.query("select * from stores where id = ? ;", [id], function (err, result) {
+    err ? console.log(err) : rep.send(JSON.stringify(result));
+  });
 });
 //取得資料，這邊會放進commentSlice狀態庫，讓comment id 大到小排列
 app.get("/comment", (req, res) => {
@@ -76,12 +72,9 @@ app.get("/comment", (req, res) => {
 //對應到dataSlice取得全部的資料(包含下架中)
 app.get("/data", (req, res) => {
   // console.log(res);
-  conn.query(
-    "SELECT * FROM `stores` ORDER BY `stores`.`id` DESC",
-    (err, result) => {
-      err ? console.log(err) : res.send(JSON.stringify(result));
-    }
-  );
+  conn.query("SELECT * FROM `stores` ORDER BY `stores`.`id` DESC", (err, result) => {
+    err ? console.log(err) : res.send(JSON.stringify(result));
+  });
 });
 //目前page2的資料是從page1就存下來的
 // app.get("/page2", (req, rep) => {
@@ -115,19 +108,14 @@ app.post("/create", (req, res) => {
   const email = req.body.userMailReg;
   const password = req.body.userPasswordReg;
 
-  conn.query(
-    "INSERT INTO users(name, email,password) VALUES (?,?,?)",
-    [name, email, password],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.send("FOXValues Inserted");
-      }
+  conn.query("INSERT INTO users(name, email,password) VALUES (?,?,?)", [name, email, password], (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send("FOXValues Inserted");
     }
-  );
+  });
 });
-
 
 // 驗證+查詢使用者個人資料
 const verifyShowUserInfo = (req, res, next) => {
@@ -142,17 +130,13 @@ const verifyShowUserInfo = (req, res, next) => {
         res.json({ auth: false, message: "U failed to authenticate" });
         //  return res.redirect('http://localhost:3000/login');   //ERR:ccess to XMLHttpRequest at 'http://localhost:3000/login' (redirected from 'http://localhost:7000/authYN') from origin 'http://localhost:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
       } else {
-        conn.query(
-          "SELECT * FROM users WHERE user_id=? ",
-          [id],
-          (err, result) => {
-            if (err) {
-              console.log(err);
-            } else {
-              res.send(result);
-            }
+        conn.query("SELECT * FROM users WHERE user_id=? ", [id], (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            res.send(result);
           }
-        );
+        });
         next();
       }
     });
@@ -160,8 +144,6 @@ const verifyShowUserInfo = (req, res, next) => {
 };
 
 app.post("/showUserInfo", verifyShowUserInfo, (req, res) => {});
-
-
 
 // 接修改前端資料
 const verifyRevise = (req, res, next) => {
@@ -178,17 +160,13 @@ const verifyRevise = (req, res, next) => {
       if (err) {
         res.json({ auth: false, message: "U failed to authenticate" });
       } else {
-        conn.query(
-          "UPDATE users SET name=?, password=?, phone=? WHERE user_id=? ",
-          [name, password, phone, id],
-          (err, result) => {
-            if (err) {
-              console.log(err);
-            } else {
-              res.send(result);
-            }
+        conn.query("UPDATE users SET name=?, password=?, phone=? WHERE user_id=? ", [name, password, phone, id], (err, result) => {
+          if (err) {
+            console.log(err);
+          } else {
+            res.send(result);
           }
-        );
+        });
         next();
       }
     });
@@ -233,34 +211,30 @@ app.post("/login", (req, res) => {
   const mailLog = req.body.mailLog;
   const passwordLog = req.body.passwordLog;
 
-  conn.query(
-    "SELECT * FROM users WHERE email = ? AND password = ?",
-    [mailLog, passwordLog],
-    (err, result) => {
-      if (err) {
-        res.send({ err: err });
-      }
-
-      if (result.length > 0) {
-        // res.send(result);
-        // res.send("登入成功");
-        //遷移資料庫後可能要改id->user_id
-        const id = result[0].id;
-        const token = jwt.sign({ id }, "jwtSecret", {
-          expiresIn: 300, //Time.5min.
-        });
-        // req.session.user = result;
-        res.json({ auth: true, token: token, result: result });
-      } else {
-        // res.send({message:"Wrong username/password combination~~~"});
-        // res.send(result);
-        res.json({
-          auth: false,
-          message: "Wrong username/password combination~~~",
-        });
-      }
+  conn.query("SELECT * FROM users WHERE email = ? AND password = ?", [mailLog, passwordLog], (err, result) => {
+    if (err) {
+      res.send({ err: err });
     }
-  );
+
+    if (result.length > 0) {
+      // res.send(result);
+      // res.send("登入成功");
+      //遷移資料庫後可能要改id->user_id
+      const id = result[0].id;
+      const token = jwt.sign({ id }, "jwtSecret", {
+        expiresIn: 300, //Time.5min.
+      });
+      // req.session.user = result;
+      res.json({ auth: true, token: token, result: result });
+    } else {
+      // res.send({message:"Wrong username/password combination~~~"});
+      // res.send(result);
+      res.json({
+        auth: false,
+        message: "Wrong username/password combination~~~",
+      });
+    }
+  });
 });
 
 //======================後台ＣＲＵＤ==================
@@ -299,40 +273,10 @@ app.post("/sdata/picupdate", (req, res) => {
 // });
 
 app.post("/sdata/create", (req, res) => {
-  const {
-    name,
-    status,
-    address,
-    phone,
-    city,
-    ft,
-    cost,
-    time1,
-    time2,
-    tag1,
-    tag2,
-    tag3,
-    article,
-    img,
-  } = req.body;
+  const { name, status, address, phone, city, ft, cost, time1, time2, tag1, tag2, tag3, article, img } = req.body;
   conn.query(
     "INSERT INTO `stores` (`name`,`status`, `address`, `phone`, `city`, `foodtype`,`cost`,`time1`,`time2`, `tag1`, `tag2`, `tag3`,`article`, `img`) VALUES (?,?, ?, ?, ?, ?,?,?,?, ?, ?, ?, ?,?);",
-    [
-      name,
-      status,
-      address,
-      phone,
-      city,
-      ft,
-      cost,
-      time1,
-      time2,
-      tag1,
-      tag2,
-      tag3,
-      article,
-      img,
-    ],
+    [name, status, address, phone, city, ft, cost, time1, time2, tag1, tag2, tag3, article, img],
     (err, result) => {
       if (err) {
         console.log(err);
@@ -346,43 +290,11 @@ app.post("/sdata/create", (req, res) => {
 });
 
 app.put("/sdata/update", (req, res) => {
-  const {
-    status,
-    name,
-    address,
-    phone,
-    city,
-    ft,
-    cost,
-    time1,
-    time2,
-    tag1,
-    tag2,
-    tag3,
-    article,
-    img,
-    id,
-  } = req.body;
+  const { status, name, address, phone, city, ft, cost, time1, time2, tag1, tag2, tag3, article, img, id } = req.body;
 
   conn.query(
     "UPDATE `stores` SET `status` = ?,`name` = ?, `address` = ?, `phone` = ?, `city` = ?, `foodtype` = ?,`cost` = ?, `time1` = ?, `time2` = ?, `tag1` = ?, `tag2` = ?, `tag3` = ?, `article`=?,`img` = ? WHERE `stores`.`id` =?",
-    [
-      status,
-      name,
-      address,
-      phone,
-      city,
-      ft,
-      cost,
-      time1,
-      time2,
-      tag1,
-      tag2,
-      tag3,
-      article,
-      img,
-      id,
-    ],
+    [status, name, address, phone, city, ft, cost, time1, time2, tag1, tag2, tag3, article, img, id],
     (err, result) => {
       if (err) {
         console.log(err);
@@ -400,18 +312,14 @@ app.put("/sdata/update", (req, res) => {
 app.delete("/sdata/delete/:id", (req, res) => {
   const id = req.params.id;
   console.log(req.params);
-  conn.query(
-    "DELETE FROM `stores` WHERE `stores`.`id` = ?",
-    id,
-    (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("delete success");
-        // console.log(id);
-        res.send(JSON.stringify(result));
-      }
-      // err ? console.log(err) : res.send(JSON.stringify(result));
+  conn.query("DELETE FROM `stores` WHERE `stores`.`id` = ?", id, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("delete success");
+      // console.log(id);
+      res.send(JSON.stringify(result));
     }
-  );
+    // err ? console.log(err) : res.send(JSON.stringify(result));
+  });
 });

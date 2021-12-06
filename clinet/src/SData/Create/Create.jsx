@@ -3,6 +3,8 @@ import { Button, Form, FormControl, Image, Modal } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { createSdata } from "../../redux/dataSlice";
 
 //卡在
 // 傳照片一定要先送出才會setnewImg
@@ -27,6 +29,8 @@ function Create({ onHide, show }) {
   const [article, setarticle] = useState("");
   const [files, setFiles] = useState([]); //FileList {0: File, length: 1}//拿來1.post2.拿來預覽
 
+  const dispatch = useDispatch();
+
   //選取照片，預覽照片
   let img = "";
   const inputImg = (e) => {
@@ -41,27 +45,30 @@ function Create({ onHide, show }) {
 
   // put餐廳資訊(等待照片上傳產生ＵＲＬ後)
   const onSubmit = async () => {
+    let temp = {
+      name: name,
+      status: status,
+      address: address,
+      phone: phone,
+      city: city,
+      ft: ft,
+      cost: cost,
+      tag1: tag1,
+      tag2: tag2,
+      tag3: tag3,
+      img: img,
+      time1: f1 + "-" + f2,
+      time2: s1 + "-" + s2,
+      article: article,
+    };
     axios
-      .post("http://localhost:3001/sdata/create", {
-        name: name,
-        status: status,
-        address: address,
-        phone: phone,
-        city: city,
-        ft: ft,
-        cost: cost,
-        tag1: tag1,
-        tag2: tag2,
-        tag3: tag3,
-        img: img,
-        time1: f1 + "-" + f2,
-        time2: s1 + "-" + s2,
-        article: article,
-      })
+      .post("http://localhost:3001/sdata/create", temp)
       .then((res) => {
         toast.success("新增成功");
-
-        window.location.reload();
+        // window.location.reload();
+        console.log(res.data.insertId); //會拿到id=res.data.insertId，放進temp裡面
+        temp.id = res.data.insertId;
+        dispatch(createSdata(temp));
       })
       .catch((error) => {
         console.error(error);
@@ -84,18 +91,12 @@ function Create({ onHide, show }) {
       })
       .then(() => {})
       .catch((e) => {
-        toast.error("Upload Error");
+        // toast.error("Upload Error");
       });
   };
 
   return (
-    <Modal
-      className="model "
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter "
-      centered
-      {...{ onHide, show }}
-    >
+    <Modal className="model " size="lg" aria-labelledby="contained-modal-title-vcenter " centered {...{ onHide, show }}>
       <Form className=" mx-auto frame my-5">
         <h5 className="line">
           修改餐廳資訊
@@ -134,8 +135,7 @@ function Create({ onHide, show }) {
             value={status}
             onChange={(e) => {
               setstatus(e.target.value);
-            }}
-          >
+            }}>
             <option value={1}>上架中</option>
             <option value={0}>下架中</option>
           </Form.Select>
@@ -147,14 +147,9 @@ function Create({ onHide, show }) {
           onChange={(e) => inputImg(e)}
           className="form-control"
           multiple
-          accept="image/gif, image/jpeg, image/png"
-        ></FormControl>
+          accept="image/gif, image/jpeg, image/png"></FormControl>
 
-        <Image
-          id="blah"
-          src={img && `http://localhost:3001/${img}`}
-          thumbnail
-        />
+        <Image id="blah" src={img && `http://localhost:3001/${img}`} thumbnail />
 
         <Form.Group className="mb-3">
           <Form.Label>餐廳地址</Form.Label>
@@ -189,8 +184,7 @@ function Create({ onHide, show }) {
             value={city}
             onChange={(e) => {
               setcity(e.target.value);
-            }}
-          >
+            }}>
             <option value="臺北">臺北</option>
             <option value="新北">新北</option>
             <option value="基隆">基隆</option>
@@ -224,8 +218,7 @@ function Create({ onHide, show }) {
             value={ft}
             onChange={(e) => {
               setft(e.target.value);
-            }}
-          >
+            }}>
             <option value="小吃">小吃</option>
             <option value="燒烤">燒烤</option>
             <option value="炸物">炸物</option>
@@ -360,8 +353,7 @@ function Create({ onHide, show }) {
             await onSubmitF(e);
             await onSubmit();
             await onHide();
-          }}
-        >
+          }}>
           確認送出
         </Button>
       </Form>

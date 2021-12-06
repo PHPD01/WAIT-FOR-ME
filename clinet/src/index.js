@@ -13,10 +13,13 @@ import "react-toastify/dist/ReactToastify.css";
 store.dispatch(storesFetch());
 store.dispatch(commentFetch());
 store.dispatch(dataFetch());
-window.addEventListener("load", () => {
-  store.dispatch(storesFetch());
-  store.dispatch(dataFetch()); //crud完從最外層重整才會重新fetch
-});
+
+//12.7修正在redux直接修改狀態
+//crud完從最外層重整才會重新fetch
+// window.addEventListener("load", () => {
+//   store.dispatch(storesFetch());
+//   store.dispatch(dataFetch());
+// });
 
 ReactDOM.render(
   <Provider store={store}>
